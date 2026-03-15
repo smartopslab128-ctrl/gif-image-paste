@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>GIF & Image Paste</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="title">GIF & Image Paste</h1>
+    <div class="actions">
+      <button type="button" class="btn btn-add" id="btnPaste" title="Add from clipboard (Ctrl+V)">+ Paste</button>
+      <button type="button" class="btn btn-secondary" id="btnFile" title="Add from file">From file</button>
+      <span class="count" id="count">0 / 50</span>
+      <button type="button" class="btn btn-secondary btn-select" id="btnSelect" title="Select multiple">Select</button>
+      <button type="button" class="btn btn-delete-mode" id="btnDeleteMode" title="Show delete buttons on objects">Delete</button>
+    </div>
+  </header>
+  <div class="bulk-bar" id="bulkBar" style="display: none;">
+    <span class="bulk-count" id="bulkCount">0 selected</span>
+    <button type="button" class="btn btn-secondary btn-sm" id="bulkFavorite">★ Favorites</button>
+    <select id="bulkTabSelect" class="toolbar-select bulk-tab-select" title="Select tab"><option value="">-- Tab --</option></select>
+    <button type="button" class="btn btn-secondary btn-sm" id="bulkAddToTab">Add to tab</button>
+    <button type="button" class="btn btn-secondary btn-sm btn-danger" id="bulkTrash">Move to trash</button>
+    <button type="button" class="btn btn-secondary btn-sm" id="bulkCancel">Cancel</button>
+  </div>
+  <div class="drop-zone" id="dropZone">
+    <p>Drag & drop images or GIFs here to add</p>
+  </div>
+  <div class="filter-row">
+    <div class="filter-tabs-scroll">
+      <nav class="filter-tabs" id="filterTabs">
+        <button type="button" class="filter-tab active" data-filter="all">All</button>
+        <button type="button" class="filter-tab" data-filter="favorites">★ Favorites</button>
+        <button type="button" class="filter-tab" data-filter="gif">GIF</button>
+        <button type="button" class="filter-tab" data-filter="image">Image</button>
+      </nav>
+      <nav class="filter-tabs filter-tabs-custom" id="customTabs"></nav>
+    </div>
+    <button type="button" class="filter-tab filter-tab-add" id="btnAddTab" title="Add tab">+</button>
+    <button type="button" class="hamburger-btn" id="btnHamburger" title="Menu">≡</button>
+    <div class="hamburger-panel" id="hamburgerPanel">
+      <div class="hamburger-panel-inner">
+        <div class="toolbar-group">
+          <label class="toolbar-label">Sort</label>
+          <select id="sortOrder" class="toolbar-select">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="manual">Manual (drag to reorder)</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <label class="toolbar-label">Size</label>
+          <select id="thumbnailSize" class="toolbar-select">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <label class="toggle-wrap">
+            <input type="checkbox" id="alwaysOnTop" checked>
+            <span>Always on top</span>
+          </label>
+        </div>
+        <div class="toolbar-group">
+          <label class="toggle-wrap">
+            <input type="checkbox" id="previewEnabled">
+            <span>Preview on click</span>
+          </label>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btnToggleURL" title="Add from URL">From URL</button>
+        <div class="toolbar-group url-add url-add-wrap" id="urlAddWrap" style="display: none;">
+          <input type="url" id="urlInput" class="url-input" placeholder="Image URL">
+          <button type="button" class="btn btn-add" id="btnFromURL">Add</button>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btnExport">Export</button>
+        <button type="button" class="btn btn-secondary" id="btnQuickExport" title="Export to last used folder">Quick Export</button>
+        <button type="button" class="btn btn-secondary" id="btnThumbnailCache" title="Build thumbnail cache for faster loading">Thumbnail cache</button>
+        <button type="button" class="btn btn-secondary btn-trash" id="btnTrash" title="Trash">Trash</button>
+      </div>
+    </div>
+  </div>
+  <main class="grid grid-size-medium" id="grid"></main>
+  <footer class="footer">
+    <span>Drag to other apps. Click to copy → Ctrl+V to paste</span>
+  </footer>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <div id="previewOverlay" class="preview-overlay" aria-hidden="true">
+    <button type="button" class="preview-close" id="previewClose" title="Close (Esc)">×</button>
+    <button type="button" class="btn btn-add preview-copy" id="previewCopy" title="Copy">Copy</button>
+    <img id="previewImg" class="preview-img" alt="Preview">
+  </div>
+  <div id="renameOverlay" class="rename-overlay" aria-hidden="true">
+    <div class="rename-panel">
+      <label class="rename-label" for="renameInput">Tab name</label>
+      <input type="text" id="renameInput" class="rename-input" maxlength="32">
+      <div class="rename-actions">
+        <button type="button" class="btn btn-secondary" id="renameCancel">Cancel</button>
+        <button type="button" class="btn btn-add" id="renameOk">OK</button>
+      </div>
+    </div>
+  </div>
+  <div id="trashOverlay" class="trash-overlay" aria-hidden="true">
+    <div class="trash-panel">
+      <div class="trash-panel-header">
+        <h2 class="trash-panel-title">Trash</h2>
+        <button type="button" class="trash-panel-close" id="trashPanelClose" title="Close">×</button>
+      </div>
+      <p class="trash-panel-hint">Deleted items are kept for 7 days, then removed automatically.</p>
+      <div class="trash-panel-list" id="trashList"></div>
+      <div class="trash-panel-actions">
+        <button type="button" class="btn btn-secondary" id="trashEmptyBtn">Empty trash</button>
+      </div>
+    </div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

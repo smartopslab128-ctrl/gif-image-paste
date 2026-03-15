@@ -1,0 +1,123 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #1a1b26;
+  --surface: #24283b;
+  --text: #c0caf5;
+  --muted: #565f89;
+  --accent: #7aa2f7;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.logo {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.main {
+  flex: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+.hero {
+  margin-bottom: 2rem;
+}
+
+.hero-text {
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+section {
+  margin-bottom: 2.5rem;
+}
+
+h2 {
+  font-size: 1.15rem;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.features ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.features li {
+  margin-bottom: 0.35rem;
+}
+
+.screenshot .placeholder {
+  background: var(--surface);
+  border: 1px dashed var(--muted);
+  color: var(--muted);
+  padding: 3rem 1rem;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.btn-download,
+.btn-support {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  transition: filter 0.15s;
+}
+
+.btn-download:hover,
+.btn-support:hover {
+  filter: brightness(1.1);
+}
+
+.btn-support {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--muted);
+}
+
+.note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.footer {
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-top: 1px solid var(--surface);
+}
