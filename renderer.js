@@ -58,6 +58,7 @@ function init() {
   const bulkTrash = document.getElementById('bulkTrash');
   const bulkCancel = document.getElementById('bulkCancel');
   const btnThumbnailCache = document.getElementById('btnThumbnailCache');
+  const linkBuyMeACoffee = document.getElementById('linkBuyMeACoffee');
   const previewToggle = document.getElementById('previewEnabled');
   const previewOverlay = document.getElementById('previewOverlay');
   const previewImg = document.getElementById('previewImg');
@@ -189,8 +190,10 @@ function init() {
     const card = document.createElement('div');
     card.className = 'card' + (isGif ? ' card-gif' : '');
     card.dataset.id = String(item.id);
+    card.draggable = true;
     card.dataset.filename = item.filename;
     const img = document.createElement('img');
+    img.draggable = false;
     // GIF: show first frame only until hover (set in captureGifFirstFrame callback)
     img.src = (isGif && objectUrl) ? '' : (objectUrl || '');
     img.alt = '';
@@ -817,6 +820,12 @@ function init() {
     });
   }
 
+  if (linkBuyMeACoffee) {
+    linkBuyMeACoffee.addEventListener('click', async () => {
+      const url = await window.api.getBmcUrl();
+      if (url) window.api.openExternal(url);
+    });
+  }
   if (btnTrash) btnTrash.addEventListener('click', openTrashPanel);
   if (trashPanelClose) trashPanelClose.addEventListener('click', () => {
     if (trashOverlay) {

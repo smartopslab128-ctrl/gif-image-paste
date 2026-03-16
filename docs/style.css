@@ -22,20 +22,27 @@ body {
 }
 
 .header {
-  padding: 3rem 1.5rem 2rem;
+  padding: 3rem 1.5rem 2.5rem;
   text-align: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--muted);
+}
+
+.header-inner {
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 .logo {
   margin: 0 0 0.5rem;
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 700;
   color: var(--accent);
 }
 
 .tagline {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: var(--muted);
 }
 
@@ -43,16 +50,18 @@ body {
   flex: 1;
   max-width: 640px;
   margin: 0 auto;
-  padding: 0 1.5rem 2rem;
+  padding: 2rem 1.5rem 3rem;
+  width: 100%;
 }
 
 .hero {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .hero-text {
-  font-size: 1.05rem;
-  color: var(--muted);
+  font-size: 1.08rem;
+  color: var(--text);
+  margin: 0;
 }
 
 section {
@@ -60,41 +69,89 @@ section {
 }
 
 h2 {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--accent);
-  margin-bottom: 0.75rem;
+  margin: 0 0 1rem;
+  font-weight: 600;
 }
 
-.features ul {
+.screenshot-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.screenshot-item {
+  background: var(--surface);
+  border: 1px solid var(--muted);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.screenshot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+
+.feature-list {
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: 1.35rem;
+  color: var(--text);
+}
+
+.feature-list li {
+  margin-bottom: 0.6rem;
+}
+
+.feature-list strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.35rem;
+  color: var(--text);
+}
+
+.steps li {
+  margin-bottom: 0.5rem;
+}
+
+.perfect-for p,
+.requirements ul {
+  margin: 0;
   color: var(--muted);
 }
 
-.features li {
+.requirements ul {
+  padding-left: 1.25rem;
+}
+
+.requirements li {
   margin-bottom: 0.35rem;
 }
 
-.screenshot .placeholder {
-  background: var(--surface);
-  border: 1px dashed var(--muted);
+.download p,
+.support p {
+  margin: 0 0 0.75rem;
   color: var(--muted);
-  padding: 3rem 1rem;
-  text-align: center;
-  border-radius: 8px;
 }
 
 .btn-download,
 .btn-support {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
+  padding: 0.85rem 1.75rem;
   background: var(--accent);
   color: var(--bg);
   text-decoration: none;
   font-weight: 600;
   border-radius: 8px;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 0;
   transition: filter 0.15s;
+  font-size: 1rem;
 }
 
 .btn-download:hover,
@@ -108,16 +165,27 @@ h2 {
   border: 1px solid var(--muted);
 }
 
-.note {
-  font-size: 0.85rem;
+.download-note,
+.support-note {
+  font-size: 0.8rem;
   color: var(--muted);
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  opacity: 0.9;
 }
 
 .footer {
   padding: 1.5rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--muted);
   border-top: 1px solid var(--surface);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
 }

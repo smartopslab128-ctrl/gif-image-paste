@@ -39,6 +39,8 @@ contextBridge.exposeInMainWorld('api', {
   showCardContextMenu: (itemId, filename, favorite, tabIds, collectionIds) => ipcRenderer.invoke('contextMenu:showCard', itemId, filename, favorite, tabIds, collectionIds),
   showTabContextMenu: (tabId, tabName) => ipcRenderer.invoke('contextMenu:showTab', tabId, tabName),
   showCollectionContextMenu: (collectionId, collectionName) => ipcRenderer.invoke('contextMenu:showCollection', collectionId, collectionName),
+  openExternal: (url) => ipcRenderer.invoke('openExternal', url),
+  getBmcUrl: () => ipcRenderer.invoke('getBmcUrl'),
   onCardUpdated: (callback) => {
     ipcRenderer.on('card-updated', (_, payload) => callback(payload));
   },

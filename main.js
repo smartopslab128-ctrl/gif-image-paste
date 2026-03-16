@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, clipboard, nativeImage, dialog, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, clipboard, nativeImage, dialog, Tray, Menu, shell } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 const fsSync = require('fs');
@@ -12,6 +12,9 @@ const SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
 const THUMBNAIL_CACHE_DIR = path.join(app.getPath('userData'), 'thumbnails');
 const MAX_FREE_ITEMS = 50;
 const MAX_PAID_ITEMS = 300;
+
+/** Replace with your Buy Me a Coffee page URL after approval. */
+const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/yourname';
 
 const ICON_ICO = path.join(__dirname, 'icon.ico');
 const ICON_PNG = path.join(__dirname, 'icon.png');
@@ -700,6 +703,11 @@ ipcMain.handle('contextMenu:showTab', async (_, tabId, tabName) => {
   menu.popup({ window: mainWindow });
 });
 
+ipcMain.handle('openExternal', (_, url) => {
+  if (url && typeof url === 'string') shell.openExternal(url);
+});
+ipcMain.handle('getBmcUrl', () => BUY_ME_A_COFFEE_URL);
+
 let mainWindow = null;
 let tray = null;
 let trayMenuUpdater = null;
@@ -749,6 +757,8 @@ function createTray() {
     { label: 'Hide', click: () => mainWindow && mainWindow.hide() },
     { type: 'separator' },
     { label: isTop ? 'Always on top: On' : 'Always on top: Off', type: 'checkbox', checked: isTop, click: (item) => { if (mainWindow) mainWindow.setAlwaysOnTop(item.checked); updateTrayMenu(); } },
+    { type: 'separator' },
+    { label: '☕ Buy Me a Coffee', click: () => shell.openExternal(BUY_ME_A_COFFEE_URL) },
     { type: 'separator' },
     { label: 'Quit', click: () => { quitting = true; tray = null; app.quit(); } },
     ]));
