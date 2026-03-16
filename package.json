@@ -11,13 +11,14 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^28.0.0",
+    "electron": "^34.0.0",
     "electron-builder": "^24.9.1"
   },
   "build": {
     "appId": "com.gifpaste.tool",
     "productName": "GIF & Image Paste",
     "directories": { "output": "dist" },
+    "asar": false,
     "win": { "target": "nsis" },
     "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
   }
