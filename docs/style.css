@@ -134,6 +134,31 @@ h2 {
   margin-bottom: 0.35rem;
 }
 
+.pricing-lead {
+  margin: 0 0 1rem;
+  color: var(--text);
+}
+
+.pricing-list {
+  margin: 0 0 1rem;
+  padding-left: 1.35rem;
+  color: var(--text);
+}
+
+.pricing-list li {
+  margin-bottom: 0.6rem;
+}
+
+.pricing-list strong {
+  color: var(--accent);
+}
+
+.pricing-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 .download p,
 .support p {
   margin: 0 0 0.75rem;
