@@ -80,10 +80,29 @@
         <button type="button" class="btn btn-secondary" id="btnQuickExport" title="Export to last used folder">Quick Export</button>
         <button type="button" class="btn btn-secondary" id="btnThumbnailCache" title="Build thumbnail cache for faster loading">Thumbnail cache</button>
         <button type="button" class="btn btn-secondary btn-trash" id="btnTrash" title="Trash">Trash</button>
+        <div class="toolbar-group toolbar-group-trial" id="trialGroup">
+          <span class="trial-status" id="trialStatus">—</span>
+        </div>
+        <div class="toolbar-group toolbar-group-upgrade">
+          <button type="button" class="btn btn-secondary" id="btnUpgrade" title="Unlock 300 items & more tabs">Upgrade ($3)</button>
+          <button type="button" class="btn btn-secondary" id="btnEnterLicense" title="Paste license key from Gumroad">Enter license</button>
+        </div>
         <div class="toolbar-group toolbar-group-bmc">
           <button type="button" class="link-bmc" id="linkBuyMeACoffee" title="Support the developer">☕ Buy Me a Coffee</button>
         </div>
       </div>
+    </div>
+  </div>
+  <div id="licenseOverlay" class="license-overlay" aria-hidden="true">
+    <div class="license-panel">
+      <h3 class="license-title">Enter license key</h3>
+      <p class="license-hint">Paste the key from your Gumroad purchase email.</p>
+      <input type="text" id="licenseInput" class="license-input" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off">
+      <div class="license-actions">
+        <button type="button" class="btn btn-secondary" id="licenseCancel">Cancel</button>
+        <button type="button" class="btn btn-add" id="licenseSubmit">Unlock</button>
+      </div>
+      <p class="license-error" id="licenseError"></p>
     </div>
   </div>
   <main class="grid grid-size-medium" id="grid"></main>

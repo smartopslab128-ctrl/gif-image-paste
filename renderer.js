@@ -93,6 +93,20 @@ function init() {
     if (countEl) countEl.textContent = `${list.count} / ${list.limit}`;
   }
 
+  function updateTrialUI(trial) {
+    const trialStatus = document.getElementById('trialStatus');
+    if (trialStatus) {
+      if (trial && trial.isPro) trialStatus.textContent = 'Unlocked';
+      else if (trial && trial.isTrialActive && trial.daysRemaining !== undefined) trialStatus.textContent = trial.daysRemaining <= 0 ? 'Trial: last day' : `Trial: ${trial.daysRemaining} day(s) left`;
+      else if (trial && !trial.isTrialActive) trialStatus.textContent = 'Trial ended — Upgrade for 300 items & more tabs';
+      else trialStatus.textContent = '—';
+    }
+    if (btnAddTab && trial) {
+      btnAddTab.disabled = !trial.canAddTab;
+      btnAddTab.title = trial.canAddTab ? 'Add tab' : 'Upgrade to add more tabs';
+    }
+  }
+
   function showCountFeedback(message, resetAfterMs) {
     if (countEl) countEl.textContent = message;
     if (resetAfterMs) setTimeout(async () => {
@@ -406,6 +420,7 @@ function init() {
     allItems = list.items || [];
     customTabs = list.customTabs || [];
     updateCount(list);
+    if (list.trial) updateTrialUI(list.trial);
     renderCustomTabs();
     await renderGrid(getFilteredItems());
   }
@@ -463,9 +478,16 @@ function init() {
     btnAddTab.addEventListener('click', async () => {
       try {
         const result = await window.api.addCustomTab();
+        if (result && result.error === 'upgrade') {
+          showToast('Upgrade to add more tabs');
+          const url = await window.api.getGumroadBuyUrl();
+          if (url) window.api.openExternal(url);
+          return;
+        }
         if (!result || !result.id) return;
         const list = await window.api.getList();
         customTabs = list.customTabs || [];
+        if (list.trial) updateTrialUI(list.trial);
         renderCustomTabs();
         setActiveFilter('tab-' + result.id);
         objectUrls.forEach((u) => URL.revokeObjectURL(u));
@@ -565,6 +587,7 @@ function init() {
       e.stopPropagation();
       dropZone.classList.remove('drag-over');
       const files = Array.from(e.dataTransfer.files || []).filter((f) => f.type.startsWith('image/'));
+      let hitLimit = false;
       for (const file of files) {
         const buf = await file.arrayBuffer();
         const ext = file.name.includes('.') ? '.' + file.name.split('.').pop() : '.png';
@@ -582,10 +605,12 @@ function init() {
           showCountFeedback('Already in library', 2500);
         } else if (result.error === 'format_not_allowed') {
           showCountFeedback('Format not allowed (use PNG, JPG, GIF, WebP, BMP)', 2500);
-        } else if (result.error === 'limit') break;
+        } else if (result.error === 'limit') { hitLimit = true; break; }
       }
       const list = await window.api.getList();
       updateCount(list);
+      if (list.trial) updateTrialUI(list.trial);
+      if (hitLimit) showCountFeedback('Limit reached. Upgrade for 300 items.', 3500);
     });
   }
 
@@ -605,7 +630,7 @@ function init() {
           const list = await window.api.getList();
           updateCount(list);
         } else if (result.error === 'duplicate') showCountFeedback('Already in library', 2500);
-        else if (result.error === 'limit') showCountFeedback('Limit reached (50)', 2500);
+        else if (result.error === 'limit') showCountFeedback('Limit reached. Upgrade for 300 items.', 3500);
         else if (result.error === 'format_not_allowed') showCountFeedback('Format not allowed (use PNG, JPG, GIF, WebP, BMP)', 2500);
         else showCountFeedback('No image in clipboard', 2500);
       } catch (_) {
@@ -633,7 +658,7 @@ function init() {
           const list = await window.api.getList();
           updateCount(list);
         } else if (result.ok && result.added && result.added.length === 0) {
-          showCountFeedback('Limit reached or duplicates skipped', 2500);
+          showCountFeedback('Limit reached or duplicates skipped. Upgrade for 300 items.', 3500);
         } else if (result.error === 'format_not_allowed') {
           showCountFeedback('Format not allowed (use PNG, JPG, GIF, WebP, BMP)', 2500);
         }
@@ -862,12 +887,58 @@ function init() {
           urlInput.value = '';
           showToast('Added!');
         } else if (result.error === 'duplicate') showCountFeedback('Already in library', 2500);
-        else if (result.error === 'limit') showCountFeedback('Limit reached (50)', 2500);
+        else if (result.error === 'limit') showCountFeedback('Limit reached. Upgrade for 300 items.', 3500);
         else if (result.error === 'format_not_allowed') showCountFeedback('Format not allowed (use PNG, JPG, GIF, WebP, BMP)', 2500);
         else showCountFeedback('Could not load URL', 2500);
       } catch (_) {
         showCountFeedback('Could not load URL', 2500);
       }
+    });
+  }
+
+  const licenseOverlay = document.getElementById('licenseOverlay');
+  const licenseInput = document.getElementById('licenseInput');
+  const licenseCancel = document.getElementById('licenseCancel');
+  const licenseSubmit = document.getElementById('licenseSubmit');
+  const licenseError = document.getElementById('licenseError');
+  const btnUpgrade = document.getElementById('btnUpgrade');
+  const btnEnterLicense = document.getElementById('btnEnterLicense');
+
+  if (btnUpgrade) {
+    btnUpgrade.addEventListener('click', async () => {
+      const url = await window.api.getGumroadBuyUrl();
+      if (url) window.api.openExternal(url);
+    });
+  }
+  if (btnEnterLicense) {
+    btnEnterLicense.addEventListener('click', () => {
+      if (licenseOverlay) { licenseOverlay.classList.add('open'); licenseOverlay.setAttribute('aria-hidden', 'false'); }
+      if (licenseInput) { licenseInput.value = ''; licenseInput.focus(); }
+      if (licenseError) licenseError.textContent = '';
+    });
+  }
+  if (licenseCancel) {
+    licenseCancel.addEventListener('click', () => {
+      if (licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
+    });
+  }
+  if (licenseSubmit && licenseInput) {
+    licenseSubmit.addEventListener('click', async () => {
+      const key = licenseInput.value.trim();
+      if (!key) { if (licenseError) licenseError.textContent = 'Enter your license key.'; return; }
+      const result = await window.api.verifyLicense(key);
+      if (result && result.ok) {
+        if (licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
+        showToast('Unlocked!');
+        refreshList();
+      } else {
+        if (licenseError) licenseError.textContent = result && result.error === 'invalid' ? 'Invalid key.' : result && result.error === 'network' ? 'Network error.' : 'Could not verify.';
+      }
+    });
+  }
+  if (licenseOverlay) {
+    licenseOverlay.addEventListener('mousedown', (e) => {
+      if (e.target === licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
     });
   }
 
@@ -950,6 +1021,7 @@ function init() {
       }
       window.api.getList().then((list) => {
         updateCount(list);
+        if (list.trial) updateTrialUI(list.trial);
         if (getFilteredItems().length === 0) grid.appendChild(createEmptyNode());
       });
     }

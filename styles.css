@@ -255,6 +255,83 @@ body {
   text-decoration: underline;
 }
 
+.toolbar-group-trial {
+  padding-top: 4px;
+  border-top: 1px solid var(--muted);
+}
+
+.toolbar-group-upgrade {
+  gap: 8px;
+}
+
+.trial-status {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.filter-tab-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.license-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.license-overlay[aria-hidden="false"],
+.license-overlay.open {
+  display: flex;
+}
+
+.license-panel {
+  background: var(--surface);
+  border: 1px solid var(--muted);
+  border-radius: 10px;
+  padding: 1.25rem;
+  min-width: 280px;
+}
+
+.license-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.license-hint {
+  margin: 0 0 0.75rem;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.license-input {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 0.75rem;
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.license-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.license-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--danger);
+}
+
 .toolbar-label {
   font-size: 11px;
   color: var(--muted);

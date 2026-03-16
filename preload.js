@@ -41,6 +41,8 @@ contextBridge.exposeInMainWorld('api', {
   showCollectionContextMenu: (collectionId, collectionName) => ipcRenderer.invoke('contextMenu:showCollection', collectionId, collectionName),
   openExternal: (url) => ipcRenderer.invoke('openExternal', url),
   getBmcUrl: () => ipcRenderer.invoke('getBmcUrl'),
+  getGumroadBuyUrl: () => ipcRenderer.invoke('license:getGumroadUrl'),
+  verifyLicense: (key) => ipcRenderer.invoke('license:verify', key),
   onCardUpdated: (callback) => {
     ipcRenderer.on('card-updated', (_, payload) => callback(payload));
   },
