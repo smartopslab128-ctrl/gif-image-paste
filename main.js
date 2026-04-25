@@ -10,15 +10,7 @@ const STORAGE_DIR = path.join(app.getPath('userData'), 'library');
 const INDEX_FILE = path.join(STORAGE_DIR, 'index.json');
 const SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
 const THUMBNAIL_CACHE_DIR = path.join(app.getPath('userData'), 'thumbnails');
-const MAX_FREE_ITEMS = 50;
-const MAX_PAID_ITEMS = 300;
-const TRIAL_DAYS = 3;
-const TRIAL_MS = TRIAL_DAYS * 24 * 60 * 60 * 1000;
-
-/** Gumroad: permalink for API (slug only). License verify uses this. */
-const GUMROAD_PRODUCT_ID = 'txhwet';
-/** Buy link: use your full product URL (custom subdomain = smartops2.gumroad.com) */
-const GUMROAD_BUY_URL = 'https://smartops2.gumroad.com/l/txhwet';
+const MAX_ITEMS = Number.MAX_SAFE_INTEGER;
 
 const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/smartopslab128';
 
@@ -37,18 +29,8 @@ function getAppIcon() {
   return nativeImage.createFromBuffer(Buffer.from(TRAY_ICON_BASE64, 'base64'));
 }
 
-function isTrialActive(firstLaunchAt) {
-  if (!firstLaunchAt || typeof firstLaunchAt !== 'number') return true;
-  return Date.now() < firstLaunchAt + TRIAL_MS;
-}
-
 async function getMaxItems() {
-  try {
-    const s = await loadSettings();
-    if (s.isPro) return MAX_PAID_ITEMS;
-    if (isTrialActive(s.firstLaunchAt)) return MAX_PAID_ITEMS;
-  } catch (_) {}
-  return MAX_FREE_ITEMS;
+  return MAX_ITEMS;
 }
 
 function hashBuffer(buf) {
@@ -131,12 +113,7 @@ function getFilePath(id, ext) {
 ipcMain.handle('storage:getList', async () => {
   const index = await loadIndex();
   await purgeOldTrash(index);
-  const s = await loadSettings();
   const limit = await getMaxItems();
-  const trialActive = isTrialActive(s.firstLaunchAt);
-  const canAddTab = s.isPro || trialActive;
-  const trialEnd = (s.firstLaunchAt != null && typeof s.firstLaunchAt === 'number') ? s.firstLaunchAt + TRIAL_MS : null;
-  const daysRemaining = trialEnd != null && trialActive ? Math.max(0, Math.ceil((trialEnd - Date.now()) / (24 * 60 * 60 * 1000))) : 0;
   const items = index.items
     .map((i) => ({ ...i, favorite: !!i.favorite, tabIds: i.tabIds || [], collectionIds: i.collectionIds || [] }))
     .sort((a, b) => (a.order != null ? a.order : a.addedAt || 0) - (b.order != null ? b.order : b.addedAt || 0));
@@ -146,7 +123,7 @@ ipcMain.handle('storage:getList', async () => {
     limit,
     customTabs: index.customTabs || [],
     collections: index.collections || [],
-    trial: { isPro: !!s.isPro, isTrialActive: trialActive, daysRemaining, canAddTab },
+    trial: { isPro: true, isTrialActive: true, daysRemaining: null, canAddTab: true },
   };
 });
 
@@ -267,8 +244,6 @@ ipcMain.handle('storage:delete', async (_, id) => {
 });
 
 ipcMain.handle('storage:addCustomTab', async () => {
-  const s = await loadSettings();
-  if (!s.isPro && !isTrialActive(s.firstLaunchAt)) return { ok: false, error: 'upgrade' };
   const index = await loadIndex();
   const id = index.nextTabId++;
   const name = 'Tab' + id;
@@ -504,7 +479,7 @@ ipcMain.handle('window:getAlwaysOnTop', () => {
   return mainWindow && !mainWindow.isDestroyed() ? mainWindow.isAlwaysOnTop() : true;
 });
 
-const DEFAULT_SETTINGS = { sortOrder: 'newest', thumbnailSize: 'medium', isPro: false, previewEnabled: true, firstLaunchAt: null, licenseKey: '' };
+const DEFAULT_SETTINGS = { sortOrder: 'newest', thumbnailSize: 'medium', previewEnabled: true, lastBmcMilestonePrompt: 0 };
 
 async function loadSettings() {
   let s;
@@ -513,10 +488,6 @@ async function loadSettings() {
     s = { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
   } catch {
     s = { ...DEFAULT_SETTINGS };
-  }
-  if (s.firstLaunchAt == null) {
-    s.firstLaunchAt = Date.now();
-    await fs.writeFile(SETTINGS_FILE, JSON.stringify(s, null, 2), 'utf-8');
   }
   return s;
 }
@@ -528,31 +499,6 @@ ipcMain.handle('settings:set', async (_, key, value) => {
   s[key] = value;
   await fs.writeFile(SETTINGS_FILE, JSON.stringify(s), 'utf-8');
   return s;
-});
-
-ipcMain.handle('license:getGumroadUrl', () => GUMROAD_BUY_URL);
-
-ipcMain.handle('license:verify', async (_, licenseKey) => {
-  const key = (licenseKey || '').trim();
-  if (!key) return { ok: false, error: 'empty' };
-  try {
-    const body = new URLSearchParams();
-    body.append('product_permalink', GUMROAD_PRODUCT_ID);
-    body.append('license_key', key);
-    const res = await fetch('https://api.gumroad.com/v2/licenses/verify', {
-      method: 'POST',
-      body,
-    });
-    const data = await res.json();
-    if (!data.success) return { ok: false, error: 'invalid' };
-    const s = await loadSettings();
-    s.isPro = true;
-    s.licenseKey = key;
-    await fs.writeFile(SETTINGS_FILE, JSON.stringify(s, null, 2), 'utf-8');
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: 'network' };
-  }
 });
 
 async function exportToPath(destDir) {

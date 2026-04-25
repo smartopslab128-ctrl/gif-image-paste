@@ -165,6 +165,16 @@ h2 {
   color: var(--muted);
 }
 
+.support .support-official {
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem;
+}
+
+.support .support-official a {
+  color: var(--accent);
+  word-break: break-all;
+}
+
 .btn-download,
 .btn-support {
   display: inline-block;
@@ -199,6 +209,33 @@ h2 {
   opacity: 0.9;
 }
 
+.ad-slot-section {
+  margin-bottom: 1rem;
+}
+
+.ad-note {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+}
+
+.ad-slot-box {
+  min-height: 120px;
+  border: 1px dashed var(--muted);
+  border-radius: 10px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.ad-slot-box p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .footer {
   padding: 1.5rem;
   text-align: center;
@@ -214,4 +251,57 @@ h2 {
 
 .footer a:hover {
   text-decoration: underline;
+}
+
+.legal h2 {
+  margin-top: 1.75rem;
+  font-size: 1.1rem;
+}
+
+.legal h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.legal p,
+.legal ul {
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+
+.legal ul {
+  padding-left: 1.35rem;
+}
+
+.legal li {
+  margin-bottom: 0.4rem;
+}
+
+.legal code {
+  font-size: 0.9em;
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.legal-updated {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+}
+
+.legal a {
+  color: var(--accent);
+}
+
+.legal-back {
+  margin-top: 2rem;
+}
+
+.legal-back-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  text-decoration: none;
 }

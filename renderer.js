@@ -67,6 +67,8 @@ function init() {
   const renameInput = document.getElementById('renameInput');
   const renameCancel = document.getElementById('renameCancel');
   const renameOk = document.getElementById('renameOk');
+  let lastBmcMilestonePrompt = 0;
+  let bmcPromptInFlight = false;
 
   if (!grid || !countEl) return;
 
@@ -90,20 +92,19 @@ function init() {
   }
 
   function updateCount(list) {
-    if (countEl) countEl.textContent = `${list.count} / ${list.limit}`;
+    const limitLabel = Number.isFinite(list.limit) ? String(list.limit) : '∞';
+    if (countEl) countEl.textContent = `${list.count} / ${limitLabel}`;
+    maybePromptBmcMilestone(list.count);
   }
 
   function updateTrialUI(trial) {
     const trialStatus = document.getElementById('trialStatus');
     if (trialStatus) {
-      if (trial && trial.isPro) trialStatus.textContent = 'Unlocked';
-      else if (trial && trial.isTrialActive && trial.daysRemaining !== undefined) trialStatus.textContent = trial.daysRemaining <= 0 ? 'Trial: last day' : `Trial: ${trial.daysRemaining} day(s) left`;
-      else if (trial && !trial.isTrialActive) trialStatus.textContent = 'Trial ended — Upgrade for 300 items & more tabs';
-      else trialStatus.textContent = '—';
+      trialStatus.textContent = 'Free';
     }
     if (btnAddTab && trial) {
-      btnAddTab.disabled = !trial.canAddTab;
-      btnAddTab.title = trial.canAddTab ? 'Add tab' : 'Upgrade to add more tabs';
+      btnAddTab.disabled = false;
+      btnAddTab.title = 'Add tab';
     }
   }
 
@@ -112,9 +113,28 @@ function init() {
     if (resetAfterMs) setTimeout(async () => {
       try {
         const list = await window.api.getList();
-        if (countEl) countEl.textContent = `${list.count} / ${list.limit}`;
+        updateCount(list);
       } catch (_) {}
     }, resetAfterMs);
+  }
+
+  async function maybePromptBmcMilestone(count) {
+    if (bmcPromptInFlight || typeof count !== 'number' || count < 100) return;
+    const milestone = Math.floor(count / 100) * 100;
+    if (milestone <= lastBmcMilestonePrompt) return;
+    bmcPromptInFlight = true;
+    try {
+      lastBmcMilestonePrompt = milestone;
+      await window.api.setSettings('lastBmcMilestonePrompt', milestone);
+      const shouldOpen = window.confirm(`You have saved ${milestone} items. If this app helps your workflow, would you like to support development on Buy Me a Coffee?`);
+      if (!shouldOpen) return;
+      const url = await window.api.getBmcUrl();
+      if (url) window.api.openExternal(url);
+    } catch (_) {
+      // no-op: prompt tracking failure should not block normal app usage
+    } finally {
+      bmcPromptInFlight = false;
+    }
   }
 
   function captureGifFirstFrame(url, itemId, onReady) {
@@ -896,52 +916,6 @@ function init() {
     });
   }
 
-  const licenseOverlay = document.getElementById('licenseOverlay');
-  const licenseInput = document.getElementById('licenseInput');
-  const licenseCancel = document.getElementById('licenseCancel');
-  const licenseSubmit = document.getElementById('licenseSubmit');
-  const licenseError = document.getElementById('licenseError');
-  const btnUpgrade = document.getElementById('btnUpgrade');
-  const btnEnterLicense = document.getElementById('btnEnterLicense');
-
-  if (btnUpgrade) {
-    btnUpgrade.addEventListener('click', async () => {
-      const url = await window.api.getGumroadBuyUrl();
-      if (url) window.api.openExternal(url);
-    });
-  }
-  if (btnEnterLicense) {
-    btnEnterLicense.addEventListener('click', () => {
-      if (licenseOverlay) { licenseOverlay.classList.add('open'); licenseOverlay.setAttribute('aria-hidden', 'false'); }
-      if (licenseInput) { licenseInput.value = ''; licenseInput.focus(); }
-      if (licenseError) licenseError.textContent = '';
-    });
-  }
-  if (licenseCancel) {
-    licenseCancel.addEventListener('click', () => {
-      if (licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
-    });
-  }
-  if (licenseSubmit && licenseInput) {
-    licenseSubmit.addEventListener('click', async () => {
-      const key = licenseInput.value.trim();
-      if (!key) { if (licenseError) licenseError.textContent = 'Enter your license key.'; return; }
-      const result = await window.api.verifyLicense(key);
-      if (result && result.ok) {
-        if (licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
-        showToast('Unlocked!');
-        refreshList();
-      } else {
-        if (licenseError) licenseError.textContent = result && result.error === 'invalid' ? 'Invalid key.' : result && result.error === 'network' ? 'Network error.' : 'Could not verify.';
-      }
-    });
-  }
-  if (licenseOverlay) {
-    licenseOverlay.addEventListener('mousedown', (e) => {
-      if (e.target === licenseOverlay) { licenseOverlay.classList.remove('open'); licenseOverlay.setAttribute('aria-hidden', 'true'); }
-    });
-  }
-
   if (alwaysOnTopCheck) {
     alwaysOnTopCheck.addEventListener('change', async () => {
       await window.api.setAlwaysOnTop(alwaysOnTopCheck.checked);
@@ -1028,12 +1002,12 @@ function init() {
   });
 
   document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea, select')) return;
     if (e.ctrlKey && e.key === 'v') {
       e.preventDefault();
       if (btnPaste) btnPaste.click();
       return;
     }
-    if (e.target.matches('input, textarea, select')) return;
     if ((renameOverlay && renameOverlay.classList.contains('open')) || (previewOverlay && previewOverlay.classList.contains('open'))) return;
     const cards = Array.from(grid.querySelectorAll('.card'));
     if (cards.length === 0) return;
@@ -1081,14 +1055,15 @@ function init() {
       const settings = await window.api.getSettings();
       sortOrder = settings.sortOrder || 'newest';
       thumbnailSize = settings.thumbnailSize || 'medium';
-       previewEnabled = settings.previewEnabled !== false;
+      previewEnabled = settings.previewEnabled !== false;
+      lastBmcMilestonePrompt = Number(settings.lastBmcMilestonePrompt || 0);
       if (sortOrderSelect) sortOrderSelect.value = sortOrder;
       if (thumbnailSizeSelect) thumbnailSizeSelect.value = thumbnailSize;
       if (previewToggle) previewToggle.checked = previewEnabled;
       grid.className = 'grid grid-size-' + thumbnailSize;
       await refreshList();
     } catch (_) {
-      if (countEl) countEl.textContent = '0 / 50';
+      if (countEl) countEl.textContent = '0 / ∞';
     }
   })();
 }

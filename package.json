@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build:win": "electron-builder --win"
+    "build:win": "electron-builder --win",
+    "build:win:portable": "electron-builder --win --config.win.target=portable"
   },
   "author": "",
   "license": "MIT",
@@ -18,8 +19,13 @@
     "appId": "com.gifpaste.tool",
     "productName": "GIF & Image Paste",
     "directories": { "output": "dist" },
-    "asar": false,
-    "win": { "target": "nsis" },
+    "files": ["main.js", "preload.js", "renderer.js", "index.html", "styles.css", "icon.png", "package.json"],
+    "icon": "icon.png",
+    "asar": true,
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
     "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
   }
 }
