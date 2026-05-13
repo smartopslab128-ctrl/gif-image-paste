@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="In-depth guides for GIF & Image Paste: setup, Discord and Slack workflows, backups, and best practices on Windows.">
+  <title>Guides — GIF &amp; Image Paste</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">Guides</h1>
+      <p class="tagline">Practical workflows for Windows users</p>
+      <nav class="site-nav" aria-label="Site">
+        <a href="index.html">Home</a>
+        <a href="guides.html">Guides</a>
+        <a href="faq.html">FAQ</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/smartopslab128-ctrl/gif-image-paste" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main legal prose">
+    <p class="legal-updated"><strong>Last updated:</strong> May 4, 2026</p>
+    <p>These guides explain how to get reliable results from <strong>GIF &amp; Image Paste</strong> in real chat and browser workflows. They are written for the current Windows build distributed from GitHub Releases. If a step differs in a future version, check the <a href="changelog.html">Changelog</a> and release notes.</p>
+
+    <h2>1. First-time setup on Windows</h2>
+    <p>Download the latest portable executable from <a href="https://github.com/smartopslab128-ctrl/gif-image-paste/releases/latest" target="_blank" rel="noopener">GitHub Releases</a>. Prefer the newest <code>v0.x</code> tag because it includes the latest fixes and documentation alignment with this site.</p>
+    <p>When you run the file for the first time, Windows SmartScreen may warn that the publisher is unknown. That is common for small indie tools that are not code-signed. If you decide to proceed, use <strong>More info</strong> → <strong>Run anyway</strong>. If your environment has strict security policies, ask your IT administrator before running unsigned software.</p>
+    <p>After launch, pin the window where it is easy to reach: many users dock it beside Discord or a browser. Enable <strong>always on top</strong> if you want the library to stay visible while you switch apps. The app can also live in the tray so it does not clutter the taskbar.</p>
+
+    <h2>2. Building a useful library (not just a dump folder)</h2>
+    <p>The fastest way to get value is to add a small set of “high frequency” assets first: your most-used reaction GIFs, a few branded images, and screenshots you paste repeatedly in support tickets. Once the basics feel smooth, expand the library over time.</p>
+    <p>Use <strong>favorites</strong> for items you paste daily, and use <strong>custom tabs</strong> when you have distinct contexts (for example “Work memes”, “Product screenshots”, “Stream overlays”). Tabs reduce scrolling and help you build muscle memory: click the tab, click the asset, paste.</p>
+    <p>If you add from URLs, remember that some hosts block hotlinking or require cookies. If a URL import fails, download the file with a browser and add it via file picker or drag-and-drop instead.</p>
+
+    <h2>3. Discord workflow (typical)</h2>
+    <p>Discord accepts pasted images in most message boxes. A reliable pattern is: click the item in GIF &amp; Image Paste to copy it to the clipboard, click into Discord, then press <kbd>Ctrl</kbd>+<kbd>V</kbd>. This pattern works consistently across channels and DMs.</p>
+    <p>Some users prefer dragging thumbnails into Discord. That can work, but behavior depends on Discord’s UI state (for example whether the composer accepts drops). If drag-and-drop is inconsistent, use clipboard paste instead.</p>
+    <p>For animated GIFs, verify the result in Discord after pasting. If a GIF appears static, the source file may not be animated, or the target app may rasterize the clipboard image. When in doubt, re-add the GIF from the original source URL or file.</p>
+
+    <h2>4. Slack workflow (typical)</h2>
+    <p>Slack messages generally accept pasted images like other chat apps. Keep Slack focused in the foreground, copy from the library, then paste into the message field. If your team uses threads heavily, the same approach applies inside thread composers.</p>
+    <p>If your organization restricts clipboard content or attachments, follow internal policies. This app stores files locally; it does not bypass enterprise controls, but your pasted content still must comply with your workplace rules.</p>
+
+    <h2>5. Browser and forum posting</h2>
+    <p>Many web editors accept pasted images, but some rich-text editors intercept clipboard data. If paste fails, try clicking the plain text area first, or use the site’s explicit “insert image” control after copying.</p>
+    <p>When you paste into forums, check file size limits. Very large PNG screenshots may exceed upload limits. Consider exporting a smaller copy outside the app if a host requires smaller assets.</p>
+
+    <h2>6. Backups and moving to a new PC</h2>
+    <p>Your library lives locally. If you reinstall Windows or move machines, plan a backup. The app includes export features; use them periodically to write your library to a folder you control (external drive, cloud-synced folder, etc.).</p>
+    <p>Treat exports as snapshots: do them before major OS upgrades or disk migrations. Keep at least two copies if the library is important for your work.</p>
+
+    <h2>7. Performance and housekeeping</h2>
+    <p>Very large libraries can make thumbnails heavier to render. If scrolling becomes slow, use favorites/tabs to reduce what is visible at once, export archives you rarely need, and consider deleting duplicates you no longer use.</p>
+    <p>If you use URL imports frequently, remember that remote servers can be slow or unreliable. Local files are usually the fastest and most predictable.</p>
+
+    <h2>8. When something goes wrong</h2>
+    <p>If copy/paste behaves inconsistently, test paste into Notepad or Paint first. That isolates whether the issue is clipboard-related or specific to the destination app.</p>
+    <p>For reproducible bugs, open a GitHub issue with: Windows version, app version, steps, and (if possible) a screen recording. That is the fastest path to a fix.</p>
+
+    <p class="legal-back"><a href="index.html" class="btn-support legal-back-link">← Back to home</a></p>
+  </main>
+
+  <footer class="footer">
+    <p><a href="index.html">Home</a> · <a href="guides.html">Guides</a> · <a href="faq.html">FAQ</a> · <a href="changelog.html">Changelog</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="https://github.com/smartopslab128-ctrl/gif-image-paste" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+</body>
+</html>
